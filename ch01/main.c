@@ -1,7 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
 
-/* power: raise base to n-th power; n >= 0 */
 int power(int base, int n)
 {
 	int i, p;
@@ -18,7 +17,7 @@ int main()
 	int i;
 
 	for (i = 0; i < 10; i++)
-		printf("%2d %4d %7d\n", i, power(2, i), power(-3, i));
+		printf("%3d %4d %6d\n", i, power(2, i), power(-3, i));
 
 	return 0;
 }
