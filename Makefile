@@ -2,7 +2,7 @@
 .PHONY: all
 CHAPTERS := ch01
 
-all: 
+all:
 	$(MAKE) -C ch01 $@
 %:
 	$(MAKE) -C ch01 $@
