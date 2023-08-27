@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: GPL-2.0
-.PHONY: all
+.PHONY: all c clean
 
+SOURCE := $(wildcard *.c)
+OBJECT := $(SOURCE:%.c=%.o)
+TARGET := $(notdir $(CURDIR))
 CFLAGS := -Wall -Werror -O2
 LFLAGS :=
-TARGET := $(notdir $(CURDIR))
-OBJECT := main.o
 
 all: $(TARGET)
 $(TARGET): $(OBJECT)
@@ -12,4 +13,4 @@ $(TARGET): $(OBJECT)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $<
 c clean:
-	@$(RM) -f $(OBJS) $(TARGET)
+	@$(RM) -f $(OBJECT) $(TARGET)
