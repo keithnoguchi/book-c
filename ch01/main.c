@@ -1,23 +1,46 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
 
-int power(int base, int n)
+#define MAXLINE 80
+
+static int getline2(char s[], int lim)
 {
-	int i, p;
+	int i, c;
 
-	p = 1;
-	for (i = 1; i <= n; i++)
-		p *= base;
+	for (i = 0; i < lim - 1
+	     && (c = getchar()) != EOF && c != '\n'; i++)
+		s[i] = c;
+	if (c == '\n') {
+		s[i] = '\0';
+		i++;
+	}
+	return i;
+}
 
-	return p;
+static void copy(char to[], char from[])
+{
+	int i = 0;
+
+	while ((to[i] = from[i]) != '\0')
+		i++;
 }
 
 int main()
 {
-	int i;
+	int len;
+	int max;
+	char line[MAXLINE];
+	char longest[MAXLINE];
 
-	for (i = 0; i < 10; i++)
-		printf("%3d %4d %6d\n", i, power(2, i), power(-3, i));
+	max = 0;
+	while ((len = getline2(line, MAXLINE)) > 0)
+		if (len > max) {
+			max = len;
+			copy(longest, line);
+		}
+
+	if (max > 0)
+		printf("%s", longest);
 
 	return 0;
 }
