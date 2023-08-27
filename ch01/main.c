@@ -1,25 +1,24 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
 
-int main() {
-	int c, i, nwhite, nother;
-	int ndigit[10];
+/* power: raise base to n-th power; n >= 0 */
+int power(int base, int n)
+{
+	int i, p;
 
-	nwhite = nother = 0;
+	p = 1;
+	for (i = 1; i <= n; i++)
+		p *= base;
+
+	return p;
+}
+
+int main()
+{
+	int i;
+
 	for (i = 0; i < 10; i++)
-		ndigit[i] = 0;
+		printf("%d %d %7d\n", i, power(2, i), power(-3, i));
 
-	while ((c = getchar()) != EOF)
-		if (c >= '0' && c <= '9')
-			++ndigit[c - '0'];
-		else if (c == ' ' || c == '\t' || c == '\n')
-			++nwhite;
-		else
-			++nother;
-
-	printf("digits = ");
-	for (i = 0; i < 10; i++)
-		printf("%d, ", ndigit[i]);
-	printf(", white space = %d, other = %d\n",
-	       nwhite, nother);
+	return 0;
 }
