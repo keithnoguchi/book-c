@@ -18,7 +18,7 @@ int main()
 	int i;
 
 	for (i = 0; i < 10; i++)
-		printf("%d %d %7d\n", i, power(2, i), power(-3, i));
+		printf("%2d %4d %7d\n", i, power(2, i), power(-3, i));
 
 	return 0;
 }
