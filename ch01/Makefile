@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0
-.PHONY: all c clean
+.PHONY: all r run c clean
 
 SOURCE := $(wildcard *.c)
 OBJECT := $(SOURCE:%.c=%.o)
@@ -12,5 +12,7 @@ $(TARGET): $(OBJECT)
 	$(CC) $(LFLAGS) -o $@ $^
 %.o: %.c
 	$(CC) $(CFLAGS) -c $<
+r run: $(TARGET)
+	@./$(TARGET)
 c clean:
 	@$(RM) -f $(OBJECT) $(TARGET)

@@ -1,13 +1,15 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
 
-/* prints out the leap years between year 1 and 3000 */
+/* getbits: machine independent bit retriever. */
+static unsigned getbits(unsigned x, int p, int n)
+{
+	return (x >> (p + 1 - n)) & ~(~0 << n);
+}
+
 int main()
 {
-	int start = 1, end = 3000;
-	int year;
-
-	for (year = start; year <= end; year++)
-		if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)
-			printf("%4d\n", year);
+	printf("0%o\n", ~0); // 037777777777 on 32bit word machine
+	printf("0%o\n", getbits(0x0f, 4, 3)); // 03
+	printf("0%o\n", getbits(0x1f, 4, 3)); // 07
 }
