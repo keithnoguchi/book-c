@@ -1,15 +1,22 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
 
-/* getbits: machine independent bit retriever. */
-static unsigned getbits(unsigned x, int p, int n)
+static int bitcount(unsigned x)
 {
-	return (x >> (p + 1 - n)) & ~(~0 << n);
+	int b;
+
+	for (b = 0; x != 0; x >>= 1)
+		if (x & 01)
+			b++;
+
+	return b;
 }
 
 int main()
 {
-	printf("0%o\n", ~0); // 037777777777 on 32bit word machine
-	printf("0%o\n", getbits(0x0f, 4, 3)); // 03
-	printf("0%o\n", getbits(0x1f, 4, 3)); // 07
+	printf("0x%x = %d\n", ~0, bitcount(~0)); // 32 or 64
+						 // depending on
+						 // the unsigned
+						 // type, e.g
+						 // int or long.
 }
