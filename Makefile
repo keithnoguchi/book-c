@@ -1,8 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
-.PHONY: all
-CHAPTERS := ch01
+CHAPTERS := ch01 ch02
 
 all:
-	$(MAKE) -C ch01 $@
 %:
-	$(MAKE) -C ch01 $@
+	$(foreach CHAPTER, $(CHAPTERS), $(MAKE) -C $(CHAPTER) $@;)
