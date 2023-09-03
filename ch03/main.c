@@ -1,30 +1,53 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
 
-static int binarysearch(int x, int v[], int n)
+/* this one is broken. https://en.wikipedia.org/wiki/Shellsort */
+void shellsort(int v[], int n)
 {
-	int low, high, mid;
+	int gap, i, j, temp;
 
-	low = 0;
-	high = n - 1;
-	while (low <= high) {
-		mid = (low + high) / 2;
-		if (x < v[mid])
-			high = mid - 1;
-		else if (x > v[mid])
-			low = mid + 1;
-		else
-			return mid;
+	for (gap = n/2; gap > 0; gap >>= 2)
+		for (i = gap; i < n; i++)
+			for (j = i - gap; j >= 0 && v[j] > v[j+gap]; j -= gap)
+				temp = v[j], v[j] = v[j+gap], v[j+gap] = temp;
+}
+
+/* https://en.wikipedia.org/wiki/Insertion_sort */
+void insertionsort(int v[], int n)
+{
+	int i, j, temp;
+
+	for (i = 1; i < n; i++) {
+		temp = v[i];
+		for (j = i - 1; j >= 0; j--)
+			if (v[j] > temp)
+				v[j+1] = v[j]; /* push back */
+			else
+				break;
+		v[j+1] = temp;
 	}
-	return -1;
+}
+
+/* https://en.wikipedia.org/wiki/Bubble_sort */
+void bubblesort(int v[], int n)
+{
+	int i, j, temp;
+
+	for (i = n-1; i > 0; i--)
+		for (j = 0; j < i; j++)
+			if (v[j] > v[j+1])
+				temp = v[j], v[j] = v[j+1], v[j+1] = temp;
 }
 
 int main()
 {
-	int v[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-	int len = sizeof(v) / sizeof(int);
-	int i;
+	int i, n, v[24];
 
-	for (i = 0; i < 12; i++)
-		printf("%2d is in index=%d\n", i, binarysearch(i, v, len));
+	n = sizeof(v) / sizeof(int);
+	for (i = 0; i < n; i++)
+		v[i] = ~i;
+
+	insertionsort(v, n);
+	for (i = 0; i < n; i++)
+		printf("%d%c", v[i], (i % 7 == 6 || i == n - 1) ? '\n' : ' ');
 }
