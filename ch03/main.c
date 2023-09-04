@@ -6,10 +6,11 @@ void shellsort(int v[], int n)
 {
 	int gap, i, j, temp;
 
-	for (gap = n/2; gap > 0; gap >>= 2)
+	for (gap = n/2; gap > 0; gap >>= 1) {
 		for (i = gap; i < n; i++)
 			for (j = i - gap; j >= 0 && v[j] > v[j+gap]; j -= gap)
 				temp = v[j], v[j] = v[j+gap], v[j+gap] = temp;
+	}
 }
 
 /* https://en.wikipedia.org/wiki/Insertion_sort */
@@ -47,7 +48,7 @@ int main()
 	for (i = 0; i < n; i++)
 		v[i] = ~i;
 
-	insertionsort(v, n);
+	shellsort(v, n);
 	for (i = 0; i < n; i++)
 		printf("%d%c", v[i], (i % 7 == 6 || i == n - 1) ? '\n' : ' ');
 }
