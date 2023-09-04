@@ -1,16 +1,15 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
 
-/* this one is broken. https://en.wikipedia.org/wiki/Shellsort */
+/* https://en.wikipedia.org/wiki/Shellsort */
 void shellsort(int v[], int n)
 {
 	int gap, i, j, temp;
 
-	for (gap = n/2; gap > 0; gap >>= 1) {
+	for (gap = n/2; gap > 0; gap >>= 1)
 		for (i = gap; i < n; i++)
 			for (j = i - gap; j >= 0 && v[j] > v[j+gap]; j -= gap)
 				temp = v[j], v[j] = v[j+gap], v[j+gap] = temp;
-	}
 }
 
 /* https://en.wikipedia.org/wiki/Insertion_sort */
