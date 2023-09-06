@@ -1,23 +1,14 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
 
-#define MAXLINE 120
+#define MAXLINE 100
 
-extern int getline2(const char s[], int limit);
-extern int strindex(const char s[], const char t[]);
-
-const char pattern[] = "ould";
+extern int getline2(char s[], int limit);
 
 int main()
 {
 	char line[MAXLINE];
-	int found = 0;
 
-	while (getline2(line, MAXLINE) > 0)
-		if (strindex(line, pattern) >= 0) {
-			printf("%s", line);
-			found++;
-		}
-
-	return found;
+	while (getline2(line, sizeof(line)) > 0)
+		printf("%s", line);
 }

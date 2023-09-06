@@ -1,5 +1,15 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-int getline2(const char s[], int limit)
+#include <stdio.h>
+
+int getline2(char s[], int limit)
 {
-	return -1;
+	int c, i;
+
+	for (i = 0; (c = getchar()) != EOF && i < limit; i++) {
+		s[i] = c;
+		if (c == '\n')
+			break;
+	}
+
+	return i;
 }
