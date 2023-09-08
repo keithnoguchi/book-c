@@ -1,18 +1,34 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
 
-#define MAXLINE 100
+#define NUMBER '\0'
+#define MAXOP 100
 
-extern int getline2(char [], int limit);
-extern double atof(const char []);
+extern int getop(void);
 
-int main()
+int main(void)
 {
-	char line[MAXLINE];
-	double sum = 0;
+	int type;
+	char s[MAXOP];
 
-	while (getline2(line, sizeof(line)) > 0)
-		printf("\t%g\n", sum += atof(line));
-
+	while ((type = getop()) != EOF) {
+		switch (type) {
+		case NUMBER:
+			break;
+		case '+':
+			break;
+		case '*':
+			break;
+		case '-':
+			break;
+		case '/':
+			break;
+		case '\n':
+			break;
+		default:
+			printf("error: unknown command %s\n", s);
+			break;
+		}
+	}
 	return 0;
 }
