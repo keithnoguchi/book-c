@@ -7,6 +7,9 @@
 
 static void quicksort(int v[], int left, int right);
 
+static void push(double);
+static double pop(void);
+
 int main(void)
 {
 	int v[50];
@@ -48,4 +51,27 @@ void swap(int v[], int i, int j)
 	temp = v[i];
 	v[i] = v[j];
 	v[j] = temp;
+}
+
+#define MAX 12
+
+static double stack[MAX];
+static int sp;
+
+static void push(double f)
+{
+	if (sp < MAX)
+		stack[sp++] = f;
+	else
+		fprintf(stderr, "error: full of stack\n");
+}
+
+static double pop(void)
+{
+	if (sp > 0)
+		return stack[--sp];
+	else {
+		fprintf(stderr, "error: empty stack\n");
+		return 0.0;
+	}
 }
