@@ -1,10 +1,11 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
+#include <stdlib.h>
 
 #define NUMBER '\0'
 #define MAXOP 100
 
-extern int getop(void);
+extern int getop(char [], int);
 
 static void push(double);
 static double pop(void);
@@ -15,9 +16,10 @@ int main(void)
 	int type;
 	char s[MAXOP];
 
-	while ((type = getop()) != EOF) {
+	while ((type = getop(s, MAXOP)) != EOF) {
 		switch (type) {
 		case NUMBER:
+			push(atof(s));
 			break;
 		case '+':
 			push(pop() + pop());
