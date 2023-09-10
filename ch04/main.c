@@ -2,10 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define NUMBER '\0'
-#define MAXOP 100
+#include "getop.h"
 
-extern int getop(char [], int);
+#define MAXOP 100
 
 static void push(double);
 static double pop(void);
