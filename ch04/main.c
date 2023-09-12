@@ -1,69 +1,51 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-#include "getop.h"
+#define SIZE 100
 
-#define MAXOP 100
-
-static void push(double);
-static double pop(void);
+static void quicksort(int v[], int left, int right);
 
 int main(void)
 {
-	double op2;
-	int type;
-	char s[MAXOP];
+	int v[50];
+	int i;
 
-	while ((type = getop(s, MAXOP)) != EOF) {
-		switch (type) {
-		case NUMBER:
-			push(atof(s));
-			break;
-		case '+':
-			push(pop() + pop());
-			break;
-		case '*':
-			push(pop() * pop());
-			break;
-		case '-':
-			op2 = pop();
-			push(pop() - op2);
-			break;
-		case '/':
-			op2 = pop();
-			push(pop() / op2);
-			break;
-		case '\n':
-			printf("\t%g\n", pop());
-			break;
-		default:
-			fprintf(stderr, "error: unknown command %s\n", s);
-			break;
-		}
-	}
-	return 0;
+	srand(time(NULL));
+	for (i = 0; i < sizeof(v) / sizeof(int); i++)
+		v[i] = rand() % 100;
+
+	quicksort(v, 0, sizeof(v) / sizeof(int) - 1);
+
+	for (i = 0; i < sizeof(v) / sizeof(int); i++)
+		printf("%2d%c", v[i], i % 10 == 9 ? '\n' : ' ');
 }
 
-#define MAX 12
+static void swap(int [], int, int);
 
-static double stack[MAX];
-static int sp;
-
-static void push(double f)
+static void quicksort(int v[], int left, int right)
 {
-	if (sp < MAX)
-		stack[sp++] = f;
-	else
-		fprintf(stderr, "error: full of stack\n");
+	int i, last;
+
+	if (left >= right)
+		return;
+
+	swap(v, left, (left + right) / 2);
+	last = left;
+	for (i = left + 1; i <= right; i++)
+		if (v[i] < v[left])
+			swap(v, ++last, i);
+	swap(v, left, last);
+	quicksort(v, left, last - 1);
+	quicksort(v, last  + 1, right);
 }
 
-static double pop(void)
+void swap(int v[], int i, int j)
 {
-	if (sp > 0)
-		return stack[--sp];
-	else {
-		fprintf(stderr, "error: empty stack\n");
-		return 0.0;
-	}
+	int temp;
+
+	temp = v[i];
+	v[i] = v[j];
+	v[j] = temp;
 }

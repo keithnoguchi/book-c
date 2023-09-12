@@ -7,4 +7,4 @@
 - Chapter 3: Control Flow
   - [Shell sort](ch03/main.c)
 - Chapter 4: Functions and Program Structures
-  - [A Reverse Polish Calculator](ch04/main.c)
+  - [A simple quick sort](ch04/main.c)
