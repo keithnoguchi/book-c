@@ -1,41 +1,36 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
 
+#define MAXLINE 10
+
+/* sort(1) program */
 int main(void)
 {
-	double d, *a, *b, *p, *alloc(int);
-	void afree(double *);
-	int i;
+	int readlines(char *[], int);
+	void writelines(char *[], int), quicksort(char *[], int, int);
+	static char *lineptr[MAXLINE];
+	int nlines;
 
-	a = alloc(50);
-	for (p = a, d = 0.0; d < 50.0; d += 1.0)
-		*p++ = d;
-	b = alloc(50);
-	for (p = b, d = 50.0; d < 100.0; d += 1.0)
-		*p++ = d;
+	if ((nlines = readlines(lineptr, MAXLINE)) > 0) {
+		quicksort(lineptr, 0, nlines - 1);
+		writelines(lineptr, nlines);
+	}
 
-	for (p = a, i = 0; i < 100; i++)
-		printf("%2g%c", *p++, i % 10 == 9 ? '\n' : ' ');
-
-	afree(b);
-	afree(a);
+	return 0;
 }
 
-#define SIZE 100
-static double allocbuf[SIZE];
-static double *allocp = allocbuf;
-
-double *alloc(int n)
+int readlines(char *lineptr[], int maxline)
 {
-	if (allocp + n <= allocbuf + SIZE) {
-		allocp += n;
-		return allocp - n;
-	} else
-		return 0;
+	return -1;
 }
 
-void afree(double *p)
+void writelines(char *lineptr[], int nlines)
 {
-	if (p >= allocbuf && p < allocp)
-		allocp = p;
+	while (nlines-- > 0)
+		printf("%s\n", *lineptr++);
+}
+
+void quicksort(char *v[], int left, int right)
+{
+	return;
 }

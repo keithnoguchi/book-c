@@ -9,4 +9,4 @@
 - Chapter 4: Functions and Program Structures
   - [A simple quick sort](ch04/main.c)
 - Chapter 5: Pointers and Arrays
-  - [`double *alloc(int)` and `void afree(double *)`](ch05/main.c)
+  - [Simple sort(1)](ch05/main.c)
