@@ -8,3 +8,5 @@
   - [Shell sort](ch03/main.c)
 - Chapter 4: Functions and Program Structures
   - [A simple quick sort](ch04/main.c)
+- Chapter 5: Pointers and Arrays
+  - [getint()](ch05/main.c)
