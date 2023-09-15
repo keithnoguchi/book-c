@@ -1,61 +1,41 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
-#include <ctype.h>
 
 int main(void)
 {
-	int ret, i, getint(int *);
+	double d, *a, *b, *p, *alloc(int);
+	void afree(double *);
+	int i;
 
-	while ((ret = getint(&i)) != EOF) {
-		if (ret == 0) {
-			fprintf(stderr, "not a number\n");
-			break;
-		}
-		printf("\t%d = getint(%d)\n", ret, i);
-	}
-	return !ret;
+	a = alloc(50);
+	for (p = a, d = 0.0; d < 50.0; d += 1.0)
+		*p++ = d;
+	b = alloc(50);
+	for (p = b, d = 50.0; d < 100.0; d += 1.0)
+		*p++ = d;
+
+	for (p = a, i = 0; i < 100; i++)
+		printf("%2g%c", *p++, i % 10 == 9 ? '\n' : ' ');
+
+	afree(b);
+	afree(a);
 }
 
-int getint(int *np)
-{
-	int getch(void);
-	void ungetch(int);
-	int c, sign;
+#define SIZE 100
+static double allocbuf[SIZE];
+static double *allocp = allocbuf;
 
-	while (isspace(c = getch()))
-		;
-	if (!isdigit(c) && c != EOF && c != '+' && c != '-') {
-		ungetch(c);
+double *alloc(int n)
+{
+	if (allocp + n <= allocbuf + SIZE) {
+		allocp += n;
+		return allocp - n;
+	} else
 		return 0;
-	}
-	sign = c == '-' ? -1 : 1;
-	if (c == '+' || c == '-')
-		c = getch();
-	for (*np = 0; isdigit(c); c = getch())
-		*np = *np * 10 + (c - '0');
-	*np *= sign;
-	if (c != EOF)
-		ungetch(c);
-	return c;
 }
 
-#define SIZE 10
-
-static int stack[SIZE];
-static int sp;
-
-int getch(void)
+void afree(double *p)
 {
-	if (sp > 0)
-		return stack[--sp];
-	else
-		return getchar();
-}
-
-void ungetch(int c)
-{
-	if (sp >= SIZE)
-		fprintf(stderr, "ungetch: stack is full\n");
-	else
-		stack[sp++] = c;
+	if (p >= allocbuf && p < allocp)
+		allocp = p;
 }
