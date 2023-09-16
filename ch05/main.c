@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MAXLINE 4
 static char *lines[MAXLINE];
@@ -11,25 +12,25 @@ static void writelines(char *[], int);
 
 int main(int argc, char *argv[])
 {
-	int strcmp(char *, char *);
+	int strcmp(char *, char *), numcmp(char *, char *);
 	int (*comp)(void *, void *) = (int (*)(void *, void *))strcmp;
 	void afree(char *);
-	int i, c, n, ret = 0;
+	int ret = EXIT_SUCCESS;
+	int i, c, n;
 
 	while (--argc > 0 && (*++argv)[0] == '-')
 		while ((c = *++argv[0]))
 			switch (c) {
 			case 'n':
-				//comp = numcmp;
+				comp = (int (*)(void *, void *))numcmp;
 				break;
 			default:
 				fprintf(stderr, "invalid option: %c\n", c);
+				ret = EXIT_FAILURE;
 				argc = 0;
-				ret = 1;
 				break;
 			}
 	while ((n = readlines(lines, MAXLINE)) > 0) {
-
 		for (i = 0; i < n; i++)
 			sorted[i] = lines[i];
 		quicksort((void **)sorted, 0, n - 1, comp);
@@ -107,6 +108,15 @@ int strcmp(char *s, char *t)
 		if (s[i] == '\0')
 			return 0;
 	return s[i] - t[i];
+}
+
+int numcmp(char *s1, char *s2)
+{
+	double v1, v2;
+
+	v1 = atof(s1);
+	v2 = atof(s2);
+	return v1 - v2;
 }
 
 void swap(void *v[], int i, int j)
