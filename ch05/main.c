@@ -2,39 +2,59 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAXLINE 100
+static int getaline(char *, int);
 
 int main(int argc, char *argv[])
 {
-	int getaline(char *, int);
+#define MAXLINE 80
+	const char *progname = argv[0];
 	char line[MAXLINE];
-	int found = 0;
+	long lineno = 0;
+	int c, except = 0, number = 0, found = 0;
 
-	if (argc < 2)
-		printf("usage: %s pattern\n", argv[0]);
-	else
-		while (getaline(line, sizeof(line)) > 0)
-			if (strstr(line, argv[1]) != NULL) {
-				printf("%s", line);
-				found++;
+	while (--argc > 0 && (*++argv)[0] == '-')
+		while ((c = *++argv[0]))
+			switch (c) {
+			case 'x':
+				except = 1;
+				break;
+			case 'n':
+				number = 1;
+				break;
+			default:
+				fprintf(stderr, "illegal option %c\n", c);
+				argc = 0;
+				found = -1;
+				break;
 			}
 
+	if (argc != 1)
+		printf("usage: %s -x -n pattern\n", progname);
+	else
+		while (getaline(line, sizeof(line)) > 0) {
+			lineno++;
+			if ((strstr(line, *argv) != NULL) != except) {
+				found++;
+				if (number)
+					printf("%ld: ", lineno);
+				printf("%s", line);
+			}
+		}
 	return found;
 }
 
-int getaline(char *line, int limit)
+static int getaline(char *line, int limit)
 {
-	char *p = line;
-	int c = EOF;
+	char *p;
+	int c;
 
-	for (p = line; line - p < limit - 1 && (c = getchar()) != EOF; p++) {
+	for (p = line; (c = getchar()) != EOF && p - line < limit - 1; p++) {
 		*p = c;
 		if (c == '\n')
 			break;
 	}
 	if (c == '\n')
-		p++;
+		++p;
 	*p = '\0';
-
 	return p - line;
 }
