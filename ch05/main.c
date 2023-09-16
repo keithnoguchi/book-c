@@ -3,14 +3,17 @@
 
 #define MAXLINE 4
 static char *lines[MAXLINE];
+static char *sorted[MAXLINE];
 
+static void quicksort(void *[], int, int, int (*)(void *, void *));
 static int readlines(char *[], int);
 static void writelines(char *[], int);
 
 int main(int argc, char *argv[])
 {
-	const char *progname = argv[0];
-	int c, n, numeric = 0, ret = 0;
+	int strcmp(char *, char *);
+	void afree(char *);
+	int i, c, n, numeric = 0, ret = 0;
 
 	while (--argc > 0 && (*++argv)[0] == '-')
 		while ((c = *++argv[0]))
@@ -24,14 +27,36 @@ int main(int argc, char *argv[])
 				ret = 1;
 				break;
 			}
-	if (argc != 1)
-		printf("usage: %s -n pattern\n", progname);
-	else
-		while ((n = readlines(lines, MAXLINE)) > 0)
-			writelines(lines, n);
+	while ((n = readlines(lines, MAXLINE)) > 0) {
+		for (i = 0; i < n; i++)
+			sorted[i] = lines[i];
+		quicksort((void **)sorted, 0, n - 1,
+			  (int (*)(void *, void *))strcmp);
+		writelines(sorted, n);
+		for (i = n - 1; i >= 0; i--)
+			afree(lines[i]);
+	}
 
 	printf("numeric=%d\n", numeric);
 	return ret;
+}
+
+static void quicksort(void *v[], int left, int right,
+		      int (*comp)(void *, void *))
+{
+	void swap(void *[], int, int);
+	int i, last;
+
+	if (left >= right)
+		return;
+	swap(v, left, (left + right) / 2);
+	last = left;
+	for (i = left + 1; i <= right; i++)
+		if ((*comp)(v[i], v[left]) < 0)
+			swap(v, i, ++last);
+	swap(v, left, last);
+	quicksort(v, left, last - 1, comp);
+	quicksort(v, last + 1, right, comp);
 }
 
 static int readlines(char *lines[], int nr)
@@ -61,17 +86,10 @@ static int readlines(char *lines[], int nr)
 
 static void writelines(char *lines[], int nr)
 {
-	void afree(char *);
 	int n;
 
 	for (n = 0; n < nr; n++)
 		printf("%s", lines[n]);
-
-	/* free lines in reverse order */
-	for (n = nr - 1; n >= 0; n--) {
-		afree(lines[n]);
-		lines[n] = NULL;
-	}
 }
 
 char *strcpy(char *s, char *t)
@@ -80,6 +98,25 @@ char *strcpy(char *s, char *t)
 	while ((*s++ = *t++))
 		;
 	return start;
+}
+
+int strcmp(char *s, char *t)
+{
+	int i;
+
+	for (i = 0; s[i] == t[i]; i++)
+		if (s[i] == '\0')
+			return 0;
+	return s[i] - t[i];
+}
+
+void swap(void *v[], int i, int j)
+{
+	void *temp;
+
+	temp = v[i];
+	v[i] = v[j];
+	v[j] = temp;
 }
 
 #define BUFSIZE 1000
@@ -102,5 +139,5 @@ void afree(char *p)
 	if (p >= allocbuf && p < allocp)
 		allocp = p;
 	else
-		fprintf(stderr, "free: invalid pointer p=%p\n", p);
+		fprintf(stderr, "afree: invalid pointer p=%p\n", p);
 }
