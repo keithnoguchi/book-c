@@ -27,7 +27,6 @@ int readlines(char *lineptr[], int maxlines)
 
 	nlines = 0;
 	while ((len = getaline(line, MAXLEN)) > 0) {
-		printf("%d=getline('%s')\n", len, line);
 		if (nlines >= maxlines || (p = alloc(len)) == NULL)
 			return -1;
 		else {
@@ -35,9 +34,15 @@ int readlines(char *lineptr[], int maxlines)
 			line[len - 1] = '\0';
 			strcpy(p, line);
 			lineptr[nlines++] = p;
+			printf("lineptr[%d]='%s'\n", nlines - 1, lineptr[nlines - 1]);
 		}
 	}
 	return nlines;
+}
+
+void quicksort(char *v[], int left, int right)
+{
+	return;
 }
 
 void writelines(char *lineptr[], int nlines)
@@ -59,12 +64,28 @@ int getaline(char *line, int nlimit)
 	return p - line;
 }
 
+#define ALLOCSIZE 1000
+static char allocbuf[ALLOCSIZE];
+static char *allocp = allocbuf;
+
 char *alloc(int n)
 {
-	return NULL;
+	if (allocp + n < allocbuf + ALLOCSIZE) {
+		allocp += n;
+		return allocp - n;
+	} else
+		return NULL;
 }
 
-void quicksort(char *v[], int left, int right)
+void afree(char *p)
 {
-	return;
+	if (p >= allocbuf && p < allocp)
+		allocp = p;
+}
+
+char *strcpy(char *s, char *t)
+{
+	while ((*s++ = *t++))
+		;
+	return s;
 }
