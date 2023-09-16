@@ -12,14 +12,15 @@ static void writelines(char *[], int);
 int main(int argc, char *argv[])
 {
 	int strcmp(char *, char *);
+	int (*comp)(void *, void *) = (int (*)(void *, void *))strcmp;
 	void afree(char *);
-	int i, c, n, numeric = 0, ret = 0;
+	int i, c, n, ret = 0;
 
 	while (--argc > 0 && (*++argv)[0] == '-')
 		while ((c = *++argv[0]))
 			switch (c) {
 			case 'n':
-				numeric = 1;
+				//comp = numcmp;
 				break;
 			default:
 				fprintf(stderr, "invalid option: %c\n", c);
@@ -28,16 +29,14 @@ int main(int argc, char *argv[])
 				break;
 			}
 	while ((n = readlines(lines, MAXLINE)) > 0) {
+
 		for (i = 0; i < n; i++)
 			sorted[i] = lines[i];
-		quicksort((void **)sorted, 0, n - 1,
-			  (int (*)(void *, void *))strcmp);
+		quicksort((void **)sorted, 0, n - 1, comp);
 		writelines(sorted, n);
 		for (i = n - 1; i >= 0; i--)
 			afree(lines[i]);
 	}
-
-	printf("numeric=%d\n", numeric);
 	return ret;
 }
 
