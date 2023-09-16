@@ -1,121 +1,55 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
 
-#define MAXLINE 10
+static char daytab[2][13] = {
+	{0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
+	{0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
+};
 
-/* sort(1) program */
+static int day_of_year(int, int, int);
+static void month_day(int, int, int *, int *);
+
 int main(void)
 {
-	int readlines(char *[], int);
-	void writelines(char *[], int), quicksort(char *[], int, int);
-	static char *lineptr[MAXLINE];
-	int nlines;
+	int year, month, day;
+	int ret, *rmonth, *rday;
 
-	if ((nlines = readlines(lineptr, MAXLINE)) > 0) {
-		quicksort(lineptr, 0, nlines - 1);
-		writelines(lineptr, nlines);
-	}
+	year = 2023;
+	month = 9;
+	day = 15;
+
+	ret = day_of_year(year, month, day);
+	printf("%04d/%02d/%02d is %d days of the year.\n",
+	       year, month, day, ret);
+
+	rmonth = &month;
+	rday = &day;
+	month_day(year, ret, rmonth, rday);
+	printf("%d days of year %04d is %04d/%02d/%02d\n",
+	       ret, year, year, *rmonth, *rday);
 
 	return 0;
 }
 
-void quicksort(char *v[], int left, int right)
+static int day_of_year(int year, int month, int day)
 {
-	void swap(char *[], int, int);
-	int i, last, strcmp(char *, char *);
+	int i, leap;
 
-	if (left >= right)
-		return;
-	swap(v, left, (left + right) / 2);
-	last = left;
-	for (i = left + 1; i <= right; i++)
-		if (strcmp(v[i], v[left]) < 0)
-			swap(v, ++last, i);
-	swap(v, left, last);
-	quicksort(v, left, last - 1);
-	quicksort(v, last + 1, right);
+	leap = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
+	for (i = 1; i < month; i++)
+		day += daytab[leap][i];
+
+	return day;
 }
 
-int strcmp(char *s, char *t)
+static void month_day(int year, int day_of_year, int *month, int *day)
 {
-	int i;
+	int i, leap;
 
-	for (i = 0; s[i] == t[i]; i++)
-		if (s[i] == '\0')
-			return 0;
-	return s[i] - t[i];
-}
+	leap = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
+	for (i = 1; day_of_year > daytab[leap][i]; i++)
+		day_of_year -= daytab[leap][i];
 
-void swap(char *v[], int i, int j)
-{
-	char *temp;
-
-	temp = v[i];
-	v[i] = v[j];
-	v[j] = temp;
-}
-
-int readlines(char *lineptr[], int maxlines)
-{
-#define MAXLEN 80
-	char *p, *alloc(int), line[MAXLEN], *strcpy(char *, char *);
-	int len, nlines, getaline(char *, int);
-
-	nlines = 0;
-	while ((len = getaline(line, MAXLEN)) > 0) {
-		if (nlines >= maxlines || (p = alloc(len)) == NULL)
-			return -1;
-		else {
-			/* drop the newline character */
-			line[len - 1] = '\0';
-			strcpy(p, line);
-			lineptr[nlines++] = p;
-		}
-	}
-	return nlines;
-}
-
-void writelines(char *lineptr[], int nlines)
-{
-	while (nlines-- > 0)
-		printf("%s\n", *lineptr++);
-}
-
-int getaline(char *line, int nlimit)
-{
-	char *p, *limit;
-	int c = EOF;
-
-	for (p = line, limit = p + nlimit; p < limit - 1 && (c = getchar()) != EOF && c != '\n'; p++)
-		*p = c;
-	if (c == '\n' && p < limit - 2)
-		*p++ = c;
-	*p = '\0';
-	return p - line;
-}
-
-#define ALLOCSIZE 1000
-static char allocbuf[ALLOCSIZE];
-static char *allocp = allocbuf;
-
-char *alloc(int n)
-{
-	if (allocp + n < allocbuf + ALLOCSIZE) {
-		allocp += n;
-		return allocp - n;
-	} else
-		return NULL;
-}
-
-void afree(char *p)
-{
-	if (p >= allocbuf && p < allocp)
-		allocp = p;
-}
-
-char *strcpy(char *s, char *t)
-{
-	while ((*s++ = *t++))
-		;
-	return s;
+	*month = i;
+	*day = day_of_year;
 }
