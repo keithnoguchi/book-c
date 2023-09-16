@@ -19,9 +19,45 @@ int main(void)
 	return 0;
 }
 
+void quicksort(char *v[], int left, int right)
+{
+	void swap(char *[], int, int);
+	int i, last, strcmp(char *, char *);
+
+	if (left >= right)
+		return;
+	swap(v, left, (left + right) / 2);
+	last = left;
+	for (i = left + 1; i <= right; i++)
+		if (strcmp(v[i], v[left]) < 0)
+			swap(v, ++last, i);
+	swap(v, left, last);
+	quicksort(v, left, last - 1);
+	quicksort(v, last + 1, right);
+}
+
+int strcmp(char *s, char *t)
+{
+	int i;
+
+	for (i = 0; s[i] == t[i]; i++)
+		if (s[i] == '\0')
+			return 0;
+	return s[i] - t[i];
+}
+
+void swap(char *v[], int i, int j)
+{
+	char *temp;
+
+	temp = v[i];
+	v[i] = v[j];
+	v[j] = temp;
+}
+
 int readlines(char *lineptr[], int maxlines)
 {
-#define MAXLEN 10
+#define MAXLEN 80
 	char *p, *alloc(int), line[MAXLEN], *strcpy(char *, char *);
 	int len, nlines, getaline(char *, int);
 
@@ -34,15 +70,9 @@ int readlines(char *lineptr[], int maxlines)
 			line[len - 1] = '\0';
 			strcpy(p, line);
 			lineptr[nlines++] = p;
-			printf("lineptr[%d]='%s'\n", nlines - 1, lineptr[nlines - 1]);
 		}
 	}
 	return nlines;
-}
-
-void quicksort(char *v[], int left, int right)
-{
-	return;
 }
 
 void writelines(char *lineptr[], int nlines)
