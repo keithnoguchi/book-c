@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0
-CHAPTERS := ch01 ch02 ch03 ch04
+CHAPTERS := ch01 ch02 ch03 ch04 ch05
 
 all:
 %:
