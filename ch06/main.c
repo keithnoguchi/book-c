@@ -38,7 +38,33 @@ static int getword(char *word, int limit)
 	return EOF;
 }
 
-static int binsearch(char *word, struct key *keytab, int nkey)
+static int binsearch(char *word, struct key *keytab, int n)
 {
+	int strcmp(const char [], const char []);
+	int low, high, mid;
+	int cond;
+
+	low = 0;
+	high = n - 1;
+	while (low <= high) {
+		mid = (low + high) / 2;
+		if ((cond = strcmp(word, keytab[mid].name)) < 0)
+			high = mid - 1;
+		else if (cond > 0)
+			low = mid + 1;
+		else
+			return mid;
+	}
 	return -1;
+}
+
+int strcmp(const char s[], const char t[])
+{
+	int i;
+
+	for (i = 0; s[i] == t[i]; i++)
+		if (s[i] == '\0')
+			return 0;
+
+	return s[i] - t[i];
 }
