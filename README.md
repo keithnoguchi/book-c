@@ -11,4 +11,4 @@
 - Chapter 5: Pointers and Arrays
   - [sort(1)](ch05/main.c)
 - Chapter 6: Structures
-  - [A keyword checker](ch06/main.c)
+  - [C keyword checker](ch06/main.c)
