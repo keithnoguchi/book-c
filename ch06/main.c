@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #define MAXWORD 20
 
@@ -44,5 +45,42 @@ void print(const struct node *root)
 
 int getword(char *word, int lim)
 {
-	return EOF;
+	int c, getch(void);
+	void ungetch(int);
+	char *p = word;
+
+	while (isspace(c = getch()))
+		;
+	if (c != EOF)
+		*p++ = c;
+	if (!isalpha(c)) {
+		*p = '\0';
+		return c;
+	}
+	for ( ; --lim > 0; p++)
+		if (!isalnum(*p = getch())) {
+			ungetch(*p);
+			break;
+		}
+	*p = '\0';
+	return word[0];
+}
+
+static char buf[BUFSIZ];
+static char *bufp = buf;
+
+int getch(void)
+{
+	if (bufp != buf)
+		return *--bufp;
+	else
+		return getchar();
+}
+
+void ungetch(int c)
+{
+	if (bufp == buf + BUFSIZ)
+		fprintf(stderr, "ungetch: buffer full\n");
+	else
+		*bufp++= c;
 }
