@@ -13,4 +13,4 @@
 - Chapter 6: Structures
   - [A word counter](ch06/main.c)
 - Chapter 7: Input and Output
-  - [A toupper program](ch07/main.c)
+  - [A minimal printf](ch07/main.c)
