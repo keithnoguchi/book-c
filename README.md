@@ -13,4 +13,4 @@
 - Chapter 6: Structures
   - [A word counter](ch06/main.c)
 - Chapter 7: Input and Output
-  - [A calculater with scanf](ch07/main.c)
+  - [A date scanner](ch07/main.c)
