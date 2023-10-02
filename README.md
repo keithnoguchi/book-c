@@ -13,4 +13,4 @@
 - Chapter 6: Structures
   - [A word counter](ch06/main.c)
 - Chapter 7: Input and Output
-  - [A date scanner](ch07/main.c)
+  - [cat(1)](ch07/main.c)

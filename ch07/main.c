@@ -1,36 +1,29 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
 
-int main(void)
+int main(int argc, char *argv[])
 {
-	int getaline(char *, int);
-	int day, month, year;
-	char monthname[20];
-	char line[BUFSIZ];
+	void filecopy(FILE *, FILE *);
+	FILE *fp;
 
-	while (getaline(line, sizeof(line)) > 0)
-		if (sscanf(line, "%d %s %d", &day, monthname, &year) == 3)
-			printf("valid: %s\n", line);
-		else if (sscanf(line, "%d/%d/%d", &year, &month, &day) == 3)
-			printf("valid: %s\n", line);
-		else
-			printf("invalid: %s\n", line);
-
+	if (argc == 1)
+		filecopy(stdin, stdout);
+	else
+		while (--argc > 0)
+			if ((fp = fopen(*++argv, "r")) == NULL) {
+				fprintf(stderr, "cat: can't open %s\n", *argv);
+				return 1;
+			} else {
+				filecopy(fp, stdout);
+				fclose(fp);
+			}
 	return 0;
 }
 
-int getaline(char *line, int lim)
+void filecopy(FILE *ifp, FILE *ofp)
 {
-	char *p;
 	int c;
 
-	p = line;
-	while ((c = getchar()) != EOF) {
-		if ((p - line) >= lim || c == '\n') {
-			*p = '\0';
-			break;
-		}
-		*p++ = c;
-	}
-	return p - line;
+	while ((c = getc(ifp)) != EOF)
+		putc(c, ofp);
 }
