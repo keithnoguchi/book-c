@@ -34,3 +34,16 @@ void filecopy(FILE *ip, FILE *op)
 	while ((c = getc(ip)) != EOF)
 		putc(c, op);
 }
+
+char *fgets(char *s, int n, FILE *iop)
+{
+	register int c;
+	register char *p = s;
+
+	while (--n > 0 && (c = getc(iop)) != EOF)
+	       if ((*p++ = c) == '\n')
+		       break;
+	*p = '\0';
+
+	return (c == EOF && p == s) ? NULL : s;
+}
