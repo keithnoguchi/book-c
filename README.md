@@ -12,3 +12,5 @@
   - [sort(1)](ch05/main.c)
 - Chapter 6: Structures
   - [A word counter](ch06/main.c)
+- Chapter 7: Input and Output
+  - [cat(1)](ch07/main.c)
