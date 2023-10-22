@@ -13,14 +13,26 @@ typedef struct {
 	char *base;
 } FILE;
 
+enum {
+	_READ = 01,
+	_WRITE = 02,
+};
+
 FILE _iob[OPEN_MAX];
 
 FILE *fopen(const char *pathname, const char *mode)
 {
+	FILE *fp;
+
 	if (*mode != 'r' || *mode != 'w' || *mode != 'a')
 		return NULL;
+	for (fp = _iob; fp != _iob + OPEN_MAX; fp++)
+		if ((fp->flag & (_READ|_WRITE)) == 0)
+			break;
+	if (fp == _iob + OPEN_MAX)
+		return NULL;
 
-	return NULL;
+	return fp;
 }
 
 int main(int argc, char *argv[])
