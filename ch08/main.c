@@ -1,12 +1,25 @@
 /* SPDX-License-Identifier: GPL-2.0 */
+#include <fcntl.h>
+
 #define NULL 0
+#define EOF (-1)
+#define OPEN_MAX 20
 
 typedef struct {
 	int fd;
+	int flag;
+	int cnt;
+	char *ptr;
+	char *base;
 } FILE;
+
+FILE _iob[OPEN_MAX];
 
 FILE *fopen(const char *pathname, const char *mode)
 {
+	if (*mode != 'r' || *mode != 'w' || *mode != 'a')
+		return NULL;
+
 	return NULL;
 }
 
@@ -15,13 +28,11 @@ int main(int argc, char *argv[])
 	FILE *fp1, *fp2;
 
 	if (argc != 3)
-		goto err;
+		return 1;
 	if ((fp1 = fopen(argv[1], "r")) == NULL)
-		goto err;
+		return 2;
 	if ((fp2 = fopen(argv[2], "w")) == NULL)
-		goto err;
+		return 3;
 
 	return 0;
-err:
-	return 1;
 }
