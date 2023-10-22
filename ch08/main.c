@@ -4,6 +4,7 @@
 #define NULL 0
 #define EOF (-1)
 #define OPEN_MAX 20
+#define PERMS 0666 /* XXX */
 
 typedef struct {
 	int fd;
@@ -23,6 +24,7 @@ FILE _iob[OPEN_MAX];
 FILE *fopen(const char *pathname, const char *mode)
 {
 	FILE *fp;
+	int fd;
 
 	if (*mode != 'r' || *mode != 'w' || *mode != 'a')
 		return NULL;
@@ -30,6 +32,10 @@ FILE *fopen(const char *pathname, const char *mode)
 		if ((fp->flag & (_READ|_WRITE)) == 0)
 			break;
 	if (fp == _iob + OPEN_MAX)
+		return NULL;
+	if (*mode == 'w')
+		fd = creat(pathname, O_WRONLY);
+	if (fd == -1)
 		return NULL;
 
 	return fp;
