@@ -1,10 +1,9 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <fcntl.h>
+#include <unistd.h>
 
-#define NULL 0
-#define EOF (-1)
-#define OPEN_MAX 20
-#define PERMS 0666 /* XXX */
+#define OPEN_MAX 10
+#define PERMS 0666
 
 typedef struct {
 	int fd;
@@ -17,26 +16,47 @@ typedef struct {
 enum {
 	_READ = 01,
 	_WRITE = 02,
+	_NOBUF = 03,
+	_EOF = 010,
+	_ERR = 020,
 };
 
-FILE _iob[OPEN_MAX];
+static FILE _iob[OPEN_MAX] = {
+	{ 0, _READ, 0, NULL, NULL },
+	{ 1, _WRITE, 0, NULL, NULL },
+	{ 2, _WRITE|_NOBUF, 0, NULL, NULL },
+};
 
-FILE *fopen(const char *pathname, const char *mode)
+FILE *fopen(const char *name, const char *mode)
 {
 	FILE *fp;
 	int fd;
 
-	if (*mode != 'r' || *mode != 'w' || *mode != 'a')
+	if (*mode != 'r' && *mode != 'w' && *mode != 'a')
 		return NULL;
-	for (fp = _iob; fp != _iob + OPEN_MAX; fp++)
+
+	for (fp = _iob; fp < _iob + OPEN_MAX; fp++)
 		if ((fp->flag & (_READ|_WRITE)) == 0)
-			break;
+		    break;
 	if (fp == _iob + OPEN_MAX)
 		return NULL;
+
+	/* open/create file descripter */
 	if (*mode == 'w')
-		fd = creat(pathname, O_WRONLY);
+		fd = creat(name, PERMS);
+	else if (*mode == 'a') {
+		if ((fd = open(name, O_WRONLY)) == -1)
+			fd = creat(name, PERMS);
+		lseek(fd, 0L, 2);
+	} else
+		fd = open(name, O_RDONLY);
 	if (fd == -1)
 		return NULL;
+
+	fp->fd = fd;
+	fp->cnt = 0;
+	fp->base = NULL;
+	fp->flag = *mode == 'r' ? _READ : _WRITE;
 
 	return fp;
 }
