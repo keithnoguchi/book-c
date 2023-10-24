@@ -5,6 +5,8 @@
 #define OPEN_MAX 10
 #define PERMS 0666
 
+#define getc(p) (--(p)->cnt >= 0 ? (unsigned char) *(p)->ptr++ : _fillbuf(p))
+
 typedef struct {
 	int fd;
 	int flag;
