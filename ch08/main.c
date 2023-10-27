@@ -9,6 +9,7 @@
 #define PERMS 0666
 
 #define getc(p) (--(p)->cnt >= 0 ? (unsigned char) *(p)->ptr++ : _fillbuf(p))
+#define putc(x, p) (--(p)->cnt >= 0 ? *(p)->ptr++ = (x) : _flushbuf((x), p))
 
 typedef struct {
 	int fd;
@@ -89,9 +90,36 @@ static int _fillbuf(FILE *fp)
 	return (unsigned char) *fp->ptr++;
 }
 
+static int _flushbuf(int x, FILE *fp)
+{
+	int bufsize, len;
+
+	if (fp < _iob || fp >= _iob + OPEN_MAX)
+		return EOF;
+	if ((fp->flag & (_WRITE|_EOF|_ERR)) != _WRITE)
+		return EOF;
+	bufsize = (fp->flag & _NOBUF) ? 1 : BUFSIZ;
+	if (fp->base == NULL) {
+		if ((fp->base = (char *)malloc(bufsize)) == NULL) {
+			fp->flag |= _ERR;
+			return EOF;
+		}
+	}
+	fp->ptr = fp->base;
+	*fp->ptr++ = (char)x;
+	fp->cnt = bufsize  - 1;
+	len = fp->ptr - fp->base;
+	if (write(fp->fd, fp->base, len) != len) {
+		fp->flag |= _ERR;
+		return EOF;
+	}
+	return x;
+}
+
 int main(int argc, char *argv[])
 {
 	FILE *fp1, *fp2;
+	int c;
 
 	if (argc != 3)
 		return 1;
@@ -99,8 +127,9 @@ int main(int argc, char *argv[])
 		return 2;
 	if ((fp2 = fopen(argv[2], "w")) == NULL)
 		return 3;
-	while (getc(fp1) != EOF)
-		;
+	while ((c = getc(fp1)) != EOF)
+		if (putc(c, fp2) == EOF)
+			return 4;
 
 	return 0;
 }
