@@ -15,4 +15,4 @@
 - Chapter 7: Input and Output
   - [cat(1)](ch07/main.c)
 - Chapter 8: The UNIX System Interface
-  - [fopen(3)](ch08/main.c)
+  - [Listing Directories](ch08/main.c)
