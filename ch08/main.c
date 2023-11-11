@@ -1,58 +1,48 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <stdio.h>
-#include <dirent.h>
-#include <string.h>
 
-static void fsize(char *);
+typedef long Align;
+
+typedef union header {
+	struct {
+		union header *ptr;
+		unsigned size;
+	} s;
+	Align x;
+} Header;
+
+static Header base;
+static Header *freep = NULL;
 
 int main(int argc, char *argv[])
 {
-	if (argc == 1)
-		fsize(".");
-	else
-		while (--argc > 0)
-			fsize(*++argv);
-	return 0;
+	printf("base=%8p\n", &base);
+	printf("freep=%p\n", freep);
 }
 
-static void fsize(char *name)
+void free(void *ap)
 {
-	void dirwalk(char *, void (*fn)(char *));
-	struct stat statbuf;
+	Header *bp, *p;
 
-	if (stat(name, &statbuf) == -1) {
-		fprintf(stderr, "fsize: can't access %s\n", name);
-		return;
-	}
-	if ((statbuf.st_mode & S_IFMT) == S_IFDIR)
-		dirwalk(name, fsize);
-	printf("%10ld %s\n", statbuf.st_size, name);
-}
+	/* find spot to add */
+	bp = (Header *)ap - 1;
+	for (p = freep; !(bp > p->s.ptr && bp < p->s.ptr->s.ptr); p = p->s.ptr)
+		if (p >= p->s.ptr && (p > bp || p->s.ptr < bp))
+			break;
 
-void dirwalk(char *dir, void (*fn)(char *))
-{
-#define MAX_PATH 1024
-	char name[MAX_PATH];
-	struct dirent *de;
-	DIR *dp;
-	int ret;
+	if (bp + bp->s.size == p) {
+		/* join to upper nbr */
+		bp->s.size += p->s.size;
+		bp->s.ptr = p->s.ptr->s.ptr;
+	} else
+		bp->s.ptr = p->s.ptr;
 
-	if ((dp = opendir(dir)) == NULL) {
-		fprintf(stderr, "dirwalk: can't open directory %s\n", dir);
-		return;
-	}
-	while ((de = readdir(dp)) != NULL) {
-		if (strcmp(de->d_name, ".") == 0 ||
-		    strcmp(de->d_name, "..") == 0)
-			continue;
-		ret = snprintf(name, sizeof(name), "%s/%s", dir, de->d_name);
-		if (ret == -1)
-			fprintf(stderr, "dirwalk: name %s/%s too long\n",
-				dir, de->d_name);
-		else
-			(*fn)(name);
-	}
-	closedir(dp);
+	if (p + p->s.size == bp) {
+		/* join to lower nbr */
+		p->s.size += bp->s.size;
+		p->s.ptr = bp->s.ptr;
+	} else
+		p->s.ptr = bp;
+
+	freep = p;
 }
