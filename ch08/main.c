@@ -1,48 +1,28 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-#include <stdio.h>
-
-typedef long Align;
-
-typedef union header {
-	struct {
-		union header *ptr;
-		unsigned size;
-	} s;
-	Align x;
-} Header;
-
-static Header base;
-static Header *freep = NULL;
+#include <string.h>
 
 int main(int argc, char *argv[])
 {
-	printf("base=%8p\n", &base);
-	printf("freep=%p\n", freep);
+	void *malloc(unsigned), free(void *);
+	char *buf[100];
+	int i, j;
+
+	for (i = 0; i < 100; i++) {
+		buf[i] = malloc(8000 + i);
+	}
+	for (i = 0; i < 100; i++)
+		memset(buf[i], i, 8000 + i);
+	for (j = 0; j < 3; j++)
+		for (i = 100 - j; i > 0; i -= 3)
+			free(buf[i - 1]);
 }
 
-void free(void *ap)
+void *malloc(unsigned nbytes)
 {
-	Header *bp, *p;
+	return NULL;
+}
 
-	/* find spot to add */
-	bp = (Header *)ap - 1;
-	for (p = freep; !(bp > p->s.ptr && bp < p->s.ptr->s.ptr); p = p->s.ptr)
-		if (p >= p->s.ptr && (p > bp || p->s.ptr < bp))
-			break;
-
-	if (bp + bp->s.size == p) {
-		/* join to upper nbr */
-		bp->s.size += p->s.size;
-		bp->s.ptr = p->s.ptr->s.ptr;
-	} else
-		bp->s.ptr = p->s.ptr;
-
-	if (p + p->s.size == bp) {
-		/* join to lower nbr */
-		p->s.size += bp->s.size;
-		p->s.ptr = bp->s.ptr;
-	} else
-		p->s.ptr = bp;
-
-	freep = p;
+void free(void *)
+{
+	return;
 }
