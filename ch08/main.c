@@ -17,6 +17,15 @@ int main(int argc, char *argv[])
 			free(buf[i - 1]);
 }
 
+typedef double Align;
+typedef union header {
+	struct {
+		union header *ptr;
+		unsigned size;
+	} s;
+	Align x;
+} Header;
+
 void *malloc(unsigned nbytes)
 {
 	return NULL;
