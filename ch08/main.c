@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
+#include <stdio.h>
 #include <string.h>
 
 int main(int argc, char *argv[])
@@ -26,8 +27,40 @@ typedef union header {
 	Align x;
 } Header;
 
+static Header base;
+static Header *freep = NULL;
+
 void *malloc(unsigned nbytes)
 {
+	Header *prevp, *p, *morecore(unsigned);
+	unsigned nunits;
+
+	nunits = (sizeof(Header) + nbytes - 1)/sizeof(Header) + 1;
+	if ((prevp = freep) == NULL) {
+		base.s.ptr = prevp = freep = &base;
+		base.s.size = 0;
+	}
+	for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) {
+		if (p->s.size >= nunits) {
+			if (p->s.size == nunits)
+				prevp->s.ptr = p->s.ptr;
+			else {
+				p->s.size -= nunits;
+				p += p->s.size;
+				p->s.size = nunits;
+			}
+			freep = prevp;
+			return (void *)(p + 1);
+		}
+		if (p == freep)
+			if ((p = morecore(nunits)) == NULL)
+				return NULL;
+	}
+}
+
+Header *morecore(unsigned nu)
+{
+	fprintf(stderr, "in morecore\n");
 	return NULL;
 }
 
