@@ -14,3 +14,5 @@
   - [A word counter](ch06/main.c)
 - Chapter 7: Input and Output
   - [cat(1)](ch07/main.c)
+- Chapter 8: The UNIX System Interface
+  - [malloc(3) and free(3)](ch08/main.c)
