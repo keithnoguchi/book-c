@@ -3,23 +3,6 @@
 #include <string.h>
 #include <unistd.h>
 
-void *malloc(unsigned), free(void *);
-
-int main(int argc, char *argv[])
-{
-	char *buf[100];
-	int i, j;
-
-	for (i = 0; i < 100; i++) {
-		buf[i] = malloc(8000 + i);
-	}
-	for (i = 0; i < 100; i++)
-		memset(buf[i], i, 8000 + i);
-	for (j = 0; j < 3; j++)
-		for (i = 100 - j; i > 0; i -= 3)
-			free(buf[i - 1]);
-}
-
 typedef double Align;
 typedef union header {
 	struct {
@@ -29,8 +12,41 @@ typedef union header {
 	Align x;
 } Header;
 
+void debug(char *name, Header *p)
+{
+	fprintf(stderr, "%s=%p\n", name, p);
+	if (p == NULL)
+		return;
+	fprintf(stderr ,"%s->s.ptr=%p\n", name, p->s.ptr);
+	fprintf(stderr ,"%s->s.size=%u\n", name, p->s.size);
+}
+
 static Header base;
 static Header *freep = NULL;
+
+void *malloc(unsigned), free(void *);
+
+int main(int argc, char *argv[])
+{
+#define NUMBER 6
+	char *buf[NUMBER];
+	int i, j;
+
+	debug("base", &base);
+	debug("freep", freep);
+
+	for (i = 0; i < NUMBER; i++) {
+		buf[i] = malloc(8000 + i);
+	}
+	for (i = 0; i < NUMBER; i++)
+		memset(buf[i], i, 8000 + i);
+	for (j = 0; j < 3; j++)
+		for (i = NUMBER - j; i > 0; i -= 3)
+			free(buf[i - 1]);
+
+	debug("base", &base);
+	debug("freep", freep);
+}
 
 void *malloc(unsigned nbytes)
 {
@@ -77,7 +93,24 @@ Header *morecore(unsigned nu)
 	return freep;
 }
 
-void free(void *)
+void free(void *ap)
 {
-	return;
+	Header *p, *bp = (Header *)ap - 1;
+
+	for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
+		if (p >= p->s.ptr && (bp < p->s.ptr || bp > p))
+			break;
+
+	if (bp + bp->s.size == p->s.ptr) {
+		bp->s.size = p->s.ptr->s.size;
+		bp->s.ptr = p->s.ptr->s.ptr;
+	} else
+		bp->s.ptr = p->s.ptr;
+	if (p + p->s.size == bp) {
+		p->s.size += bp->s.size;
+		p->s.ptr = bp->s.ptr;
+	} else
+		p->s.ptr = bp;
+
+	freep = p;
 }
