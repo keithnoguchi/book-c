@@ -4,7 +4,7 @@
 TARGET := $(notdir $(CURDIR))
 SOURCE := $(wildcard *.c)
 OBJECT := $(SOURCE:.c=.o)
-CFLAGS := -Wall -Werror -O2 -fno-builtin
+CFLAGS := -Wall -Werror -O2 -fno-builtin -g
 LFLAGS :=
 
 all: $(TARGET)

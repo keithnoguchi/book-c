@@ -1,10 +1,12 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+
+void *malloc(unsigned), free(void *);
 
 int main(int argc, char *argv[])
 {
-	void *malloc(unsigned), free(void *);
 	char *buf[100];
 	int i, j;
 
@@ -60,8 +62,19 @@ void *malloc(unsigned nbytes)
 
 Header *morecore(unsigned nu)
 {
-	fprintf(stderr, "in morecore\n");
-	return NULL;
+#define NALLOC 1024
+	Header *up;
+	void *p;
+
+	if (nu < NALLOC)
+		nu = NALLOC;
+	p = sbrk(nu * sizeof(Header));
+	if (p == (void *)-1)
+		return NULL;
+	up = (Header *)p;
+	up->s.size = nu;
+	free((void *)(up + 1));
+	return freep;
 }
 
 void free(void *)
